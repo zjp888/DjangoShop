@@ -1,2 +1,2 @@
 # DjangoShop
-DjangoShop项目
+Djang电商项目专用
