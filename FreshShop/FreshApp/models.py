@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-#卖家模型类
+#用户
 class Seller(models.Model):
     username = models.CharField(max_length=32,verbose_name="用户名")
     password = models.CharField(max_length=32,verbose_name="密码")

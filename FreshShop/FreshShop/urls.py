@@ -18,6 +18,6 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/',admin.site.urls),
-    path('sh/',include('FreshApp.urls')),
+    path('fresh/',include('FreshApp.urls')),
     path('ckeditor/',include('ckeditor_uploader.urls'))
 ]
