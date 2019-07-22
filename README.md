@@ -1,0 +1,2 @@
+# DjangoShop
+DjangoShop项目
