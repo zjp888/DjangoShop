@@ -2,15 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="55421af9-a1bd-44fa-aee6-0a895ffdaf51" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/FreshApp/templates/freshApp/add_goods.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FreshApp/templates/freshApp/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FreshApp/templates/freshApp/list_goods.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FreshApp/templates/freshApp/register_store.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FreshApp/templates/freshApp/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/FreshApp/templates/freshApp/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FreshApp/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/FreshApp/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FreshApp/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/FreshApp/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -53,10 +45,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/FreshApp/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="37">
+            <state relative-caret-position="-74">
               <caret line="161" column="38" lean-forward="true" selection-start-line="161" selection-start-column="38" selection-end-line="161" selection-end-column="38" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
@@ -98,10 +90,10 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/FreshApp/templates/freshApp/list_goods.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="473">
+            <state relative-caret-position="103">
               <caret line="43" column="44" selection-start-line="43" selection-start-column="44" selection-end-line="43" selection-end-column="44" />
             </state>
           </provider>
@@ -329,19 +321,27 @@
       <option name="presentableId" value="Default" />
       <updated>1563760998047</updated>
       <workItem from="1563761003893" duration="48598000" />
-      <workItem from="1563864725379" duration="26338000" />
+      <workItem from="1563864725379" duration="26582000" />
     </task>
+    <task id="LOCAL-00001" summary="商品列表页实现。">
+      <created>1563898240448</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1563898240448</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="74936000" />
+    <option name="totallyTimeSpent" value="75180000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.20347957" />
+      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.20347957" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Docker" order="0" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="1" />
@@ -392,6 +392,10 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="商品列表页实现。" />
+    <option name="LAST_COMMIT_MESSAGE" value="商品列表页实现。" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/FreshApp/templates/urls.py" />
@@ -638,20 +642,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/FreshApp/templates/freshApp/list_goods.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="473">
-          <caret line="43" column="44" selection-start-line="43" selection-start-column="44" selection-end-line="43" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/FreshApp/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="37">
+        <state relative-caret-position="-74">
           <caret line="161" column="38" lean-forward="true" selection-start-line="161" selection-start-column="38" selection-end-line="161" selection-end-column="38" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/FreshApp/templates/freshApp/list_goods.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="103">
+          <caret line="43" column="44" selection-start-line="43" selection-start-column="44" selection-end-line="43" selection-end-column="44" />
         </state>
       </provider>
     </entry>
