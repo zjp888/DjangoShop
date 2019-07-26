@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Buyer',
     'FreshApp',
     'ckeditor',
     'ckeditor_uploader',
@@ -127,7 +128,7 @@ STATICFILES_DIRS = (
 # STATIC_ROOT = os.path.join(BASE_DIR,"static")
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR,'static/freshApp/img')
+MEDIA_ROOT = os.path.join(BASE_DIR,'static')
 
 CKEDITOR_UPLOAD_PATH = "static/upload"
 CKEDITOR_IMAGE_BACKEND = "pillow"

@@ -17,7 +17,7 @@ def loginVaild(fun):
         u_cookies = request.COOKIES.get("username")
         s_session = request.session.get("username")
         if u_cookies and s_session and u_cookies == s_session:
-                return fun(request,*args,**kwargs)
+            return fun(request,*args,**kwargs)
         return HttpResponseRedirect('/fresh/login')
     return inner
 #用户注册
@@ -64,7 +64,7 @@ def login(request):
                     response.set_cookie("user_id",user.id)#cookie提供用户id方便其他功能查询
                     store = Store.objects.filter(user_id=user.id).first() #查看店铺是否存在
                     if store:
-                        response.set_cookie("has_store",store.id).first()
+                        response.set_cookie("has_store",store.id)
                     else:
                         response.set_cookie("has_store","")#检验是否有店铺
                     return response
@@ -131,6 +131,7 @@ def add_goods(request):
     """
     负责添加商品
     """
+    goods_type_list = GoodsType.objects.all()
     if request.method == "POST":
         goods_name = request.POST.get("goods_name")
         goods_price = request.POST.get("goods_price")
@@ -140,6 +141,7 @@ def add_goods(request):
         goods_safeDate = request.POST.get("goods_safeDate")
         goods_store = request.COOKIES.get("has_store")
         goods_image = request.FILES.get("goods_image")
+        goods_type = request.POST.get("goods_type")
         #开始保存数据
         goods = Goods()
         goods.goods_name = goods_name
@@ -149,6 +151,7 @@ def add_goods(request):
         goods.goods_date = goods_date
         goods.goods_safeDate = goods_safeDate
         goods.goods_image = goods_image
+        goods.goods_type = GoodsType.objects.get(id = int(goods_type))
         goods.save()
 
         #保存多对多数据
@@ -156,12 +159,16 @@ def add_goods(request):
             Store.objects.get(id=int(goods_store))
         )
         goods.save()
-        return HttpResponseRedirect("/fresh/list_goods/")
+        return HttpResponseRedirect("/fresh/list_goods/up/")
     return render(request,"freshApp/add_goods.html",locals())
 
 #商品以形式展开列表
 @loginVaild
-def list_goods(request):
+def list_goods(request,state):
+    if state == "up":
+        state_num = 1
+    else:
+        state_num = 0
 
     #判断如果搜索不为空的情况下
     keywords = request.GET.get("keywords","")#获取关键字
@@ -169,19 +176,19 @@ def list_goods(request):
    #查询店铺
     store_id = request.COOKIES.get("has_store")
     store = Store.objects.get(id=int(store_id))
-    referer = request.META.get("'HTTP_REFERER'")
+    # referer = request.META.get("'HTTP_REFERER'")
     if keywords:
-        goods_list = Goods.objects.filter(goods_name__contains=keywords)
+        goods_list = store.goods_set.filter(goods_name__contains=keywords,goods_under=state_num)#完成了下架查询
+    # else:
+    #     if referer and "?" in referer:
+    #         get_str = referer.split("?")[1]
+    #         get_list = [i.split("=") for i in get_str.split("&")]
+    #         get_dict = dict(get_list)
+    #         if "keyword" in get_dict:
+    #             keywords = get_dict["keywords"]
+    #         goods_list = Goods.objects.filter(goods_name__contains=keywords)
     else:
-        if referer and "?" in referer:
-            get_str = referer.split("?")[1]
-            get_list = [i.split("=") for i in get_str.split("&")]
-            get_dict = dict(get_list)
-            if "keyword" in get_dict:
-                keywords = get_dict["keywords"]
-            goods_list = Goods.objects.filter(goods_name__contains=keywords)
-        else:
-            goods_list = Goods.objects.all()
+        goods_list = store.goods_set.filter(goods_under=state_num)
 
     paginator = Paginator(goods_list,3)
     page = paginator.page(int(page_unm))
@@ -220,18 +227,68 @@ def update_goods(request,goods_id):
     #保存多对多数据
     return render(request,"freshApp/update_goods.html",locals())
 
+#添加商品类型
+@loginVaild
+def add_goods_type(request):
+    pass
 #查询拥有指定商品的店铺
-def CookieTest(request):
-    # 查询拥有指定商品的所有店铺
-    goods = Goods.objects.get(id = 1)
-    store_list = goods.store_id.all()
-    store_list = goods.store_id.filter()
-    store_list = goods.store_id.get()
-    # 查询指定店铺拥有的所有商品
-    store = Store.objects.get(id=17)
-    store.goods_set.filter()
-    store.goods_set.all()
+# def CookieTest(request):
+#     # 查询拥有指定商品的所有店铺
+#     goods = Goods.objects.get(id = 1)
+#     store_list = goods.store_id.all()
+#     store_list = goods.store_id.filter()
+#     store_list = goods.store_id.get()
+#     # 查询指定店铺拥有的所有商品
+#     store = Store.objects.get(id=17)
+#     store.goods_set.filter()
+#     store.goods_set.all()
 
+#商品列表类型
+@loginVaild
+def list_goods_type(request):
+    goods_type_list = GoodsType.objects.all()
+    if request.method == "POST":
+        name = request.POST.get("name")
+        description = request.POST.get("description")
+        picture = request.POST.get("picture")
 
+        goods_type = GoodsType()
+        goods_type.name = name
+        goods_type.description = description
+        goods_type.picture = picture
+        goods_type.save()
+    return render(request,"freshApp/goods_type_list.html",locals())
+
+#删除商品类型
+@loginVaild
+def delete_goods_type(request):
+    id = int(request.GET.get("id"))
+    goods = GoodsType.objects.get(id=id)
+    goods.delete()
+    return HttpResponseRedirect("/fresh/list_goods_type/")
+
+#商品下架
+def set_goods(request,state):
+    if state == "up":
+        state_num = 1
+    else:
+        state_num = 0
+    id = request.GET.get("id")
+    print(id)
+    referer = request.META.get("HTTP_REFERER")
+    if id:
+        goods = Goods.objects.filter(id=id).first()
+        if state == "delete":
+            goods.delete()
+        else:
+            goods.goods_under = state_num #修改状态
+            goods.save()
+    return HttpResponseRedirect(referer)
+#退出清楚koolie
+def logout(request):
+    response = HttpResponseRedirect("/fresh/login/")
+    for key in request.COOKIES:
+        response.delete_cookie(key)
+    return response
 
 

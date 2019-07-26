@@ -39,29 +39,11 @@
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>店铺管理</span>
         </a>
-{#          <a class="nav-link" href="/fresh/register_store/">#}
-{#          <i class="fas fa-fw fa-tachometer-alt"></i>#}
-{#          <span>没有店铺,注册一个</span>#}
-{#        </a>#}
       </li>
-
       <!-- Divider -->
       <hr class="sidebar-divider">
-
       <!-- Heading -->
       <div class="sidebar-heading">销售管理</div>
-
-{#      <!-- Nav Item - Pages Collapse Menu -->#}
-{#      <li class="nav-item">#}
-{#        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">#}
-{#          <div class="bg-white py-2 collapse-inner rounded">#}
-{#            <h6 class="collapse-header">Custom Components:</h6>#}
-{#            <a class="collapse-item" href="buttons.html"></a>#}
-{#            <a class="collapse-item" href="cards.html">Cards</a>#}
-{#          </div>#}
-{#        </div>#}
-{#      </li>#}
-
       <!-- Nav Item - Utilities Collapse Menu -->
       <li class="nav-item">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
@@ -72,10 +54,17 @@
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">商品管理</h6>
             <a class="collapse-item" href="/fresh/add_goods/">添加商品</a>
-            <a class="collapse-item" href="/fresh/list_goods/">商品列表</a>
+            <a class="collapse-item" href="/fresh/list_goods/up/">在售商品列表</a>
+          <a class="collapse-item" href="/fresh/list_goods/down/">下架商品列表</a>
           </div>
         </div>
       </li>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="/fresh/list_goods_type/">
+      <i class="fas fa-fw fa-cog"></i>
+      <span>商品类型管理</span>
+    </a>
+    </li>
     </ul>
     <!-- End of Sidebar -->
     {% else %}
@@ -91,10 +80,7 @@
       <hr class="sidebar-divider my-0">
       <!-- Nav Item - Dashboard -->
       <li class="nav-item">
-{#        <a class="nav-link" href="/fresh/register_store/">#}
-{#          <i class="fas fa-fw fa-tachometer-alt"></i>#}
-{#          <span>店铺管理</span>#}
-{#        </a>#}
+
           <a class="nav-link" href="/fresh/register_store/">
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>没有店铺,注册一个</span>
@@ -280,8 +266,10 @@
                 </a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                     <a class="dropdown-item" href="/fresh/logout/">
                   <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                   退出
+                     </a>
                 </a>
               </div>
             </li>
