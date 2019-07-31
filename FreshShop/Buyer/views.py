@@ -1,7 +1,9 @@
 from alipay import AliPay
 import hashlib
+import time
 
 from django.shortcuts import render
+from django.http import JsonResponse
 from django.shortcuts import HttpResponse
 from django.shortcuts import HttpResponseRedirect
 
@@ -81,6 +83,15 @@ def index(request):
             #查询类型当中所有的数据
             result_list.append(goods_type)#有数据的类型放入result_list
     return render(request,"buyer/index.html",locals())
+#商品详情页
+def goods_detail(request):
+    goods_id = request.GET.get("goods_id")
+    if goods_id:
+        goods = Goods.objects.filter(id=goods_id).first()
+        if goods:
+             return render(request,"buyer/detail.html",locals())
+    return HttpResponse("没有找到指定的商品")
+
 
 @loginVaild
 def goods_list(request):
@@ -102,6 +113,112 @@ def logout(request):
         response.delete_cookie(key)
     del request.session["username"]
     return response
+
+#设置订单号时间+用户id，商品id，商铺id
+def setOrderId(user_id,goods_id,store_id):
+    strtime = time.strftime("%Y%m%d%H%M%S",time.localtime())
+    return str(strtime)+str(user_id)+str(goods_id)+str(store_id)
+
+
+#购买的详情
+def place_order(request):
+    if request.method == "POST":
+        count = int(request.POST.get("count"))
+        goods_id = request.POST.get("goods_id")
+        user_id = request.COOKIES.get("user_id")
+        goods = Goods.objects.get(id=goods_id)
+        store_id = goods.store_id.id
+        price = goods.goods_price
+        order = Order()
+        order.order_id = setOrderId(str(user_id),str(goods_id),str(store_id))
+        order.goods_count = count
+        order.order_user = Buyer.objects.get(id=user_id)
+        order.order_price = count * price
+        order.save()
+        order_detail = OrderDetail()
+        order_detail.order_id = order
+        order_detail.goods_id = goods_id
+        order_detail.goods_name = goods.goods_name
+        order_detail.goods_price = goods.goods_price
+        order_detail.goods_number = count
+        order_detail.goods_total = count * goods.goods_price
+        order_detail.goods_store = store_id
+        order_detail.goods_image = goods.goods_image
+        order_detail.save()
+        detail = [order_detail]
+        return render(request, "buyer/place_order.html", locals())
+    else:
+        order_id = request.GET.get("order_id")
+        if order_id:
+            order = Order.objects.get(id=order_id)
+            detail = order.orderdetail_set.all()
+            return render(request, "buyer/place_order.html", locals())
+        else:
+            return HttpResponse("非法请求")
+#购物车
+def cart(request):
+    user_id = request.COOKIES.get("user_id")
+    goods_list = Cart.objects.filter(user_id=user_id)
+    if request.method == "POST":
+        post_data = request.POST
+        cart_data = []
+        for k,v in post_data.items():
+            if k.startswith("goods_"):
+                cart_data.append(Cart.objects.get(id=int(v)))
+        goods_count = len(cart_data)
+        goods_total = sum(([int(i.goods_total) for i in cart_data]))
+        #保存订单
+        order = Order()
+        # 订单当中有多个商品或者多个店铺，使用goods_count来代替商品id，用2代替店铺id
+        order.order_id = setOrderId(user_id,goods_count,"2")
+        order.goods_count = goods_count
+        order.order_user = Buyer.objects.get(id=user_id)
+        order.order_price = goods_total
+        order.order_status = 1
+        order.save()
+        # 保存订单详情
+        # 这里的detail是购物车里的数据实例，不是商品的实例
+        for detail in cart_data:
+            order_detail = OrderDetail()
+            order_detail.order_id = order  # order是一条订单数据
+            order_detail.goods_id = detail.goods_id
+            order_detail.goods_name = detail.goods_name
+            order_detail.goods_price = detail.goods_price
+            order_detail.goods_number = detail.goods_number
+            order_detail.goods_total = detail.goods_total
+            order_detail.goods_store = detail.goods_store
+            order_detail.goods_image = detail.goods_picture
+            order_detail.save()
+        # order是一条订单支付页
+        url = "/buyer/place_order/?order_id=%s"%order.id
+        return HttpResponseRedirect(url)
+    return render(request,"buyer/cart.html",locals())
+#添加购物车
+def add_cart(request):
+    result = {"status":"error","data":""}
+    if request.method == "POST":
+        count = int(request.POST.get("count"))
+        print(count)
+        goods_id = request.POST.get("goods_id")
+        goods = Goods.objects.get(id=int(goods_id))
+        user_id = request.COOKIES.get("user_id")
+        cart = Cart()
+        cart.goods_name = goods.goods_name
+        cart.goods_price = goods.goods_price
+        cart.goods_total = goods.goods_price * count
+        cart.goods_number = count
+        cart.goods_picture= goods.goods_image
+        cart.goods_id = goods.id
+        cart.goods_store = goods.store_id.id
+        cart.user_id = user_id
+        cart.save()
+        result["status"] = "success"
+        result["data"] = "商品添加成功"
+    else:
+        result["data"] = "请求错误"
+    return JsonResponse(result)
+
+
 
 def pay_result(request):
     """
@@ -164,3 +281,7 @@ def pay_order(request):
     )
 
     return HttpResponseRedirect("https://openapi.alipaydev.com/gateway.do?"+order_string)
+
+def base_zhifu(request):
+    return render(request,"buyer/base_zhifu.html")
+

@@ -3,21 +3,28 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.http import HttpResponseRedirect
 from FreshApp.models import *
-
+from Buyer.models import *
 # Create your views here.
 #对用户的密码进行加密
 def setPassword(password):
+    #进行哈希md5加密
     md5 = hashlib.md5()
+    #加密原型语句加解码
     md5.update(password.encode())
+    #加密成为16进制数
     return md5.hexdigest()
 
 #定义装饰器来校验首页列表
 def loginVaild(fun):
     def inner(request,*args,**kwargs):
+        #验证是重登录页面请求的网页要不然即使账号密码对也不可以
         u_cookies = request.COOKIES.get("username")
         s_session = request.session.get("username")
+        #校验cookies和session是否正确
         if u_cookies and s_session and u_cookies == s_session:
+            #如果正确调用函数index并执行
             return fun(request,*args,**kwargs)
+        #如果不正确返回登录页面
         return HttpResponseRedirect('/fresh/login')
     return inner
 #用户注册
@@ -28,14 +35,19 @@ def register(request):
     进行注册数据保存
     """
     if request.method == "POST":
+        #获取前段通过request过来的数据
         username = request.POST.get("username")
         password = request.POST.get("password")
+        #判断username和password是否为空
         if username and password:
+            #如果不为空创建用户实例进行赋值
             seller = Seller()
             seller.username = username
             seller.password = setPassword(password)
             seller.nickname = username
+            #进行保存数据库
             seller.save()
+            #进行重新定向到登录页面
             return HttpResponseRedirect("/fresh/login/")
     return render(request,"freshApp/register.html",locals())
 
@@ -76,22 +88,13 @@ def index(request):
     检查账号是否有店铺
     """
     #查询当前用户是谁
-    # user_id = request.COOKIES.get("user_id")
-    # if user_id:
-    #     user_id = int(user_id)
-    # else:
-    #     user_id = 0
     # #通过用户查询店铺是否存在(店铺和用户之间用id进行关联)
-    # store = Store.objects.filter(user_id=user_id).first()
-    # if store:
-    #     is_store = 1
-    # else:
-    #     is_store = 0
     return render(request,"freshApp/index.html")
 
 #base页
 def base(request):
     return render(request,"freshApp/base.html",locals())
+
 @loginVaild
 def register_store(request):
     type_list = StoreType.objects.all()
@@ -103,7 +106,7 @@ def register_store(request):
         store_phone = post_data.get("store_phone")
         store_money = post_data.get("store_money")
 
-        user_id = int(request.COOKIES.get("user_id"))#通过cookie来得到user_id
+        user_id = int(request.COOKIES.get("user_id"))#通过cookie来得到user.id
         type_lists = post_data.getlist("type")#通过request.post得到类型，但是是一个列表
         store_logo = request.FILES.get("store_logo") #通过request.FILES得到
 
@@ -152,12 +155,11 @@ def add_goods(request):
         goods.goods_safeDate = goods_safeDate
         goods.goods_image = goods_image
         goods.goods_type = GoodsType.objects.get(id = int(goods_type))
-        goods.save()
-
+        goods.store_id = Store.objects.get(id=int(goods_store))
         #保存多对多数据
-        goods.store_id.add(
-            Store.objects.get(id=int(goods_store))
-        )
+        # goods.store_id.add(
+        #     Store.objects.get(id=int(goods_store))
+        # )
         goods.save()
         return HttpResponseRedirect("/fresh/list_goods/up/")
     return render(request,"freshApp/add_goods.html",locals())
@@ -179,20 +181,13 @@ def list_goods(request,state):
     # referer = request.META.get("'HTTP_REFERER'")
     if keywords:
         goods_list = store.goods_set.filter(goods_name__contains=keywords,goods_under=state_num)#完成了下架查询
-    # else:
-    #     if referer and "?" in referer:
-    #         get_str = referer.split("?")[1]
-    #         get_list = [i.split("=") for i in get_str.split("&")]
-    #         get_dict = dict(get_list)
-    #         if "keyword" in get_dict:
-    #             keywords = get_dict["keywords"]
-    #         goods_list = Goods.objects.filter(goods_name__contains=keywords)
     else:
         goods_list = store.goods_set.filter(goods_under=state_num)
 
     paginator = Paginator(goods_list,3)
     page = paginator.page(int(page_unm))
     page_range = paginator.page_range
+
     return render(request,"freshApp/list_goods.html",locals())
 
 #设置详情页
@@ -250,7 +245,7 @@ def list_goods_type(request):
     if request.method == "POST":
         name = request.POST.get("name")
         description = request.POST.get("description")
-        picture = request.POST.get("picture")
+        picture = request.FILES.get("picture")
 
         goods_type = GoodsType()
         goods_type.name = name
@@ -284,6 +279,17 @@ def set_goods(request,state):
             goods.goods_under = state_num #修改状态
             goods.save()
     return HttpResponseRedirect(referer)
+
+#已支付完成的订单
+def order_complet(request):
+    return render(request,"freshApp/order_complet.html",locals())
+
+#订单处理
+def order_list(request):
+    store_id = request.COOKIES.get("has_store")
+    order_list = OrderDetail.objects.filter(order_id__order_status=2,goods_store=store_id)
+    return render(request,"freshApp/order_list.html",locals())
+
 #退出清楚koolie
 def logout(request):
     response = HttpResponseRedirect("/fresh/login/")
@@ -292,3 +298,18 @@ def logout(request):
     return response
 
 
+from rest_framework import viewsets
+from FreshApp.serializers import *
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = Goods.objects.all()#返回具体的数据
+    serializer_class = UserSerializers#指定过滤的类
+
+
+class TypeViewSet(viewsets.ModelViewSet):
+    """返回具体查询的内容"""
+    queryset = GoodsType.objects.all()
+    serializer_class = GoodsTypeSerializer
+
+
+def ajax_api_list_goods(request):
+    return render(request,"freshApp/API_goods_list.html")

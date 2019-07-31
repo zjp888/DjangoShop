@@ -16,5 +16,8 @@ urlpatterns = [
     re_path(r'set_goods/(?P<state>\w+)/', set_goods), #设置商品状态
     path("list_goods_type/",list_goods_type),
     path("delete_goods_type/",delete_goods_type),
+    path("order_list/",order_list),
+    path("order_complet/",order_complet),
+    path("ajax_api_list_goods/",ajax_api_list_goods),
 
 ]
