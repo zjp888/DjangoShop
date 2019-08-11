@@ -1,6 +1,7 @@
 import hashlib
 from django.shortcuts import render
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from FreshApp.models import *
 from Buyer.models import *
@@ -300,11 +301,13 @@ def logout(request):
 
 from rest_framework import viewsets
 from FreshApp.serializers import *
+from django_filters.rest_framework import DjangoFilterBackend #导入过滤器
 class UserViewSet(viewsets.ModelViewSet):
     queryset = Goods.objects.all()#返回具体的数据
     serializer_class = UserSerializers#指定过滤的类
 
-
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["goods_name","goods_price"]
 class TypeViewSet(viewsets.ModelViewSet):
     """返回具体查询的内容"""
     queryset = GoodsType.objects.all()
@@ -313,3 +316,12 @@ class TypeViewSet(viewsets.ModelViewSet):
 
 def ajax_api_list_goods(request):
     return render(request,"freshApp/API_goods_list.html")
+
+from django.views.decorators.cache import cache_page
+@cache_page(60*15)
+def Test(request):
+    # def hello():
+    #     return HttpResponse("hello word")
+    red = HttpResponse("i am rep")
+    # red.render = hello
+    return red

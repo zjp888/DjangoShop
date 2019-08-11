@@ -285,3 +285,13 @@ def pay_order(request):
 def base_zhifu(request):
     return render(request,"buyer/base_zhifu.html")
 
+
+#elecry框架异步任务启动
+from CeleryTask.tasks import add
+from django.http import JsonResponse
+def get_add(request):
+    add.delay(2,5)
+    return JsonResponse({"status":200})
+
+
+

@@ -42,9 +42,13 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     'rest_framework',
+    'CeleryTask',
+    'djcelery'
 ]
-
+#中间件
 MIDDLEWARE = [
+    #全栈缓存添加
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -52,6 +56,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'FreshShop.middleware.MiddlewareTest',
+    'django.middleware.cache.FetchFromCacheMiddleware',
+
 ]
 
 ROOT_URLCONF = 'FreshShop.urls'
@@ -110,13 +117,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -139,5 +146,84 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2
+    'PAGE_SIZE':2,
+    'DEFAULT_RENDERER_CLASSES':(
+        'utils.rendererresponse.Customrenderer',
+    ),
+    'DEFAULT_FILTER_BACKENDS':(
+        'django_filters.rest_framework.DjangoFilterBackend',#django自带查询过滤器
+    )
 }
+#配置邮件服务器
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend" #发送邮件采用smtp服务
+EMAIL_USE_TLS = False #使用tls方式
+EMAIL_HOST = "smtp.qq.com"
+EMAIL_PORT = 465
+EMAIL_HOST_USER = "452341999@qq.com"
+EMAIL_HOST_PASSWORD = "XXX"
+DEFAULT_FROM_EMAIL = "3392279511@qq.com"
+
+#celery
+import djcelery #导入django-celery
+djcelery.setup_loader()#进行模块加载
+BROKER_URL = 'redis://127.0.0.1:6379/1'#任务容器地址，redi数据库
+CELERY_IMPORTS = ('CeleryTask.tasks')#具体的任务文件
+CELERY_TIMEZONE = 'Asia/Shanghai'#clery时区
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler' #celey处理器，固定
+
+#celery 的定时器
+from celery.schedules import crontab
+from celery.schedules import timedelta
+
+CELERYBEAT_SCHEDULE = { #定时器策略
+    #定时任务一：没30秒运行一次
+    u"测试定时器1":{
+        'task':'celeryTask.tasks.taskExample',
+        'schedule':timedelta(seconds=30),
+        'args':(),
+    },
+
+}
+#使用django换缓存
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#         'LOCATION':[
+#           '127.0.0.1:11211'
+#         ],
+#     }
+# }
+#使用redis缓存技术
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',
+#         'LOCATION':[
+#             'redis://127.0.0.1:6379/1',
+#         ],
+#         'OPTIONS':{
+#             'CLIENT_CLASS':'django_redis.client.DefaultClient'
+#         }
+#     }
+# }
+#数据库缓存
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core。',
+#         'LOCATION':[
+#           '127.0.0.1:11211'
+#         ],
+#     }
+# }
+#数据库缓存
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION':'tab_name'
+    }
+}
+
+#设置缓存超时时间
+CACHE_MIDDLEWARE_KEY_PREFIX = ''
+CACHE_MIDDLEWARE_SECONDS = 600
+
+

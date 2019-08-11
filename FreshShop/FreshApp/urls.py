@@ -1,6 +1,7 @@
 from django.urls import path
 from django.urls import re_path
 from FreshApp.views import *
+from django.views.decorators.cache import cache_page
 
 urlpatterns = [
     path("register/",register),
@@ -13,11 +14,14 @@ urlpatterns = [
     re_path(r"list_goods/(?P<state>\w+)",list_goods),
     re_path(r"^goods/(?P<goods_id>\d+)",goods),
     re_path(r"update_goods/(?P<goods_id>\d+)",update_goods),
-    re_path(r'set_goods/(?P<state>\w+)/', set_goods), #设置商品状态
+    re_path(r'set_goods/(?P<state>\w+)/',set_goods),#设置商品状态
     path("list_goods_type/",list_goods_type),
     path("delete_goods_type/",delete_goods_type),
     path("order_list/",order_list),
     path("order_complet/",order_complet),
     path("ajax_api_list_goods/",ajax_api_list_goods),
 
+]
+urlpatterns+=[
+    path("Test/",Test),
 ]

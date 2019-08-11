@@ -17,4 +17,5 @@ urlpatterns+=[
     path("pay_order/", pay_order),
     path("pay_result/", pay_result),
     path("base_zhifu/", base_zhifu),
+    path("get_add/", get_add),
 ]
